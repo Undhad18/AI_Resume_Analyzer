@@ -18,11 +18,14 @@ const envSchema = z.object({
     DB_PASSWORD: z.string(),
     DB_NAME: z.string().min(1),
 
-    JWT_SECRET: z.string().min(32),
+    JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters long"),
+    JWT_ACCESS_EXPIRES_IN: z.string().default("15m"),
+    JWT_ISSUER: z.string().default("ai-resume-analyzer"),
+    JWT_AUDIENCE: z.string().default("ai-resume-analyzer-api"),
 
     OPENAI_API_KEY: z.string().optional(),
 
-    OPENAI_MODEL: z.string().optional()
+    OPENAI_MODEL: z.string().default("gpt-4o-mini")
 });
 
 const result = envSchema.safeParse(process.env);
