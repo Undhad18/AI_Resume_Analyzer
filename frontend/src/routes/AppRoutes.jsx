@@ -10,6 +10,9 @@ import Dashboard from "../pages/dashboard/Dashboard";
 import Profile from "../pages/dashboard/Profile";
 import UploadResume from "../pages/dashboard/UploadResume";
 import MyResumes from "../pages/dashboard/MyResumes";
+import ResumeBuilder from "../pages/dashboard/ResumeBuilder";
+import JobDescriptions from "../pages/dashboard/JobDescriptions";
+import ResumeJobMatching from "../pages/JobMatching/ResumeJobMatching";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 
@@ -53,7 +56,11 @@ const AppRoutes = () => {
 
           <Route
             path="/job-matching"
-            element={<Placeholder title="Job Description Matching" description="Match your resume against specific job requirements to optimize keyword alignment." />}
+            element={<ResumeJobMatching />}
+          />
+          <Route
+            path="/job-descriptions"
+            element={<JobDescriptions />}
           />
 
           <Route
@@ -69,7 +76,7 @@ const AppRoutes = () => {
 
           <Route
             path="/builder"
-            element={<Placeholder title="Resume Builder" description="Create an ATS-friendly, professionally structured resume directly in the browser." />}
+            element={<ResumeBuilder />}
           />
 
           {/* User Account & Preference Routes */}

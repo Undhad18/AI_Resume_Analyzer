@@ -311,6 +311,8 @@ export const getResumeFileForPreviewOrDownload = async ({ resumeId, userId }) =>
             r.resume_id,
             r.user_id,
             r.resume_title,
+            r.candidate_name,
+            r.extracted_text,
             r.status,
             r.created_at,
             rf.file_id,
@@ -373,6 +375,9 @@ export const getResumeFileForPreviewOrDownload = async ({ resumeId, userId }) =>
         userId: record.user_id,
         filePath: resolvedFilePath,
         originalFilename: record.file_name,
+        resumeTitle: record.resume_title,
+        candidateName: record.candidate_name,
+        extractedText: record.extracted_text,
         mimeType,
         fileType: record.file_type,
         fileSize: stats.size

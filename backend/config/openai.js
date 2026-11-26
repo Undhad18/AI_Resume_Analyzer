@@ -72,6 +72,13 @@ export const resetOpenAiClient = () => {
     openAiClientInstance = null;
 };
 
+/**
+ * Set singleton instance for testing/mocking
+ */
+export const setOpenAiClientInstance = (mockClient) => {
+    openAiClientInstance = mockClient;
+};
+
 // Backward-compatible default export proxy
 const defaultClientProxy = new Proxy({}, {
     get(target, prop) {

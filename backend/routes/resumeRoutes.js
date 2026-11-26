@@ -13,7 +13,26 @@ import {
     structureResumeFile,
     evaluateResumeWithAi,
     analyzeResume,
-    getResumeAnalysis
+    analyzeResumeFree,
+    getResumeAnalysis,
+    calculateAtsScore,
+    getAtsScore,
+    calculateDetailedScore,
+    getDetailedScore,
+    calculateFormattingGrammarScore,
+    getFormattingGrammarScore,
+    calculateStrengthsWeaknesses,
+    getStrengthsWeaknesses,
+    detectSkillsKeywords,
+    getSkillsKeywords,
+    generateImprovementSuggestions,
+    getImprovementSuggestions,
+    updateImprovementSuggestionStatus,
+    enhanceResume,
+    getEnhancementDraft,
+    updateDraft,
+    approveDraft,
+    discardDraft
 } from "../controllers/resumeController.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import db from "../config/db.js";
@@ -52,6 +71,63 @@ router.post("/:resumeId/ai-evaluate", authenticateToken, evaluateResumeWithAi);
 
 // Complete AI resume analysis engine workflow (Lesson 5.5)
 router.post("/:resumeId/analyze", authenticateToken, analyzeResume);
+
+// Free deterministic rule-based resume analysis (zero OpenAI API calls)
+router.post("/:resumeId/analyze-free", authenticateToken, analyzeResumeFree);
+
+// Calculate deterministic ATS compatibility score (Lesson 6.2)
+router.post("/:resumeId/ats-score", authenticateToken, calculateAtsScore);
+
+// Fetch latest ATS score record for resume
+router.get("/:resumeId/ats-score", authenticateToken, getAtsScore);
+
+// Calculate detailed Skills, Education, and Experience score (Lesson 6.3)
+router.post("/:resumeId/detailed-score", authenticateToken, calculateDetailedScore);
+
+// Fetch latest detailed score record for resume
+router.get("/:resumeId/detailed-score", authenticateToken, getDetailedScore);
+
+// Calculate formatting and grammar score (Lesson 6.4)
+router.post("/:resumeId/formatting-grammar-score", authenticateToken, calculateFormattingGrammarScore);
+
+// Fetch latest formatting and grammar score record for resume
+router.get("/:resumeId/formatting-grammar-score", authenticateToken, getFormattingGrammarScore);
+
+// Detect strengths, weaknesses, and missing information (Lesson 7.1)
+router.post("/:resumeId/strengths-weaknesses", authenticateToken, calculateStrengthsWeaknesses);
+
+// Fetch latest strengths and weaknesses record for resume
+router.get("/:resumeId/strengths-weaknesses", authenticateToken, getStrengthsWeaknesses);
+
+// Detect missing skills and keywords (Lesson 7.2)
+router.post("/:resumeId/skills-keywords", authenticateToken, detectSkillsKeywords);
+
+// Fetch latest skills and keywords record for resume
+router.get("/:resumeId/skills-keywords", authenticateToken, getSkillsKeywords);
+
+// Generate improvement suggestions (Lesson 7.3)
+router.post("/:resumeId/improvement-suggestions", authenticateToken, generateImprovementSuggestions);
+
+// Fetch latest improvement suggestions record for resume
+router.get("/:resumeId/improvement-suggestions", authenticateToken, getImprovementSuggestions);
+
+// Update status of specific suggestion (pending / accepted / completed / dismissed)
+router.patch("/:resumeId/improvement-suggestions/:suggestionId/status", authenticateToken, updateImprovementSuggestionStatus);
+
+// Generate resume enhancement draft (Lesson 7.4)
+router.post("/:resumeId/enhance", authenticateToken, enhanceResume);
+
+// Fetch latest enhancement draft for resume
+router.get("/:resumeId/enhance/draft", authenticateToken, getEnhancementDraft);
+
+// Update editable draft content
+router.put("/:resumeId/enhance/draft/:draftId", authenticateToken, updateDraft);
+
+// Approve enhancement draft and create improved resume version
+router.post("/:resumeId/enhance/draft/:draftId/approve", authenticateToken, approveDraft);
+
+// Discard enhancement draft
+router.post("/:resumeId/enhance/draft/:draftId/discard", authenticateToken, discardDraft);
 
 // Fetch latest analysis record for resume
 router.get("/:resumeId/analysis", authenticateToken, getResumeAnalysis);

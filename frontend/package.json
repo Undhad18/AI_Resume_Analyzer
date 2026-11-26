@@ -8,7 +8,15 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node tests/resumeValidation.test.js"
+    "test": "node tests/resumeValidation.test.js && node tests/resumeBuilder.test.js && node tests/resumeSections.test.js && node tests/resumeContentGenerator.test.js && node tests/resumeTemplates.test.js && node tests/resumePdfDownload.test.js && node tests/jobDescriptions.test.js && node tests/jobMatchReport.test.js",
+    "test:validation": "node tests/resumeValidation.test.js",
+    "test:builder": "node tests/resumeBuilder.test.js",
+    "test:sections": "node tests/resumeSections.test.js",
+    "test:content-generator": "node tests/resumeContentGenerator.test.js",
+    "test:templates": "node tests/resumeTemplates.test.js",
+    "test:pdf-download": "node tests/resumePdfDownload.test.js",
+    "test:job-descriptions": "node tests/jobDescriptions.test.js",
+    "test:job-match-report": "node tests/jobMatchReport.test.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.5",

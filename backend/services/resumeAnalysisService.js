@@ -61,8 +61,8 @@ export const createPendingAnalysisRecord = async ({ userId, resumeId, aiModel })
     // 2. Insert new pending analysis record
     const [result] = await db.execute(
         `INSERT INTO resume_analyses 
-         (user_id, resume_id, analysis_status, ai_model, analyzed_at)
-         VALUES (?, ?, 'pending', ?, NOW())`,
+         (user_id, resume_id, analysis_status, analysis_type, ai_model, analyzed_at)
+         VALUES (?, ?, 'pending', 'ai', ?, NOW())`,
         [userId, resumeId, aiModel || getOpenAiModel()]
     );
 
@@ -114,43 +114,49 @@ export const getLatestAnalysisForResume = async ({ resumeId, userId }) => {
         throw err;
     }
 
+    // 1. Verify resume existence and verify strict tenant ownership
+    const [resumeRows] = await db.execute(
+        `SELECT resume_id, user_id, resume_title, candidate_name
+         FROM resumes 
+         WHERE resume_id = ? AND deleted_at IS NULL`,
+        [parsedResumeId]
+    );
+
+    if (!resumeRows.length) {
+        return null;
+    }
+
+    const resumeRecord = resumeRows[0];
+    if (resumeRecord.user_id !== userId) {
+        const err = new AnalysisWorkflowError(
+            "Access denied: you do not own this resource",
+            403,
+            "FORBIDDEN_RESOURCE"
+        );
+        throw err;
+    }
+
+    // 2. Query latest analysis record for this verified resume
     const [rows] = await db.execute(
         `SELECT 
-            a.analysis_id,
-            a.user_id,
-            a.resume_id,
-            a.overall_score,
-            a.analysis_status,
-            a.ai_model,
-            a.analysis_result,
-            a.error_message,
-            a.analyzed_at,
-            r.resume_title,
-            r.candidate_name
-         FROM resume_analyses a
-         JOIN resumes r ON a.resume_id = r.resume_id
-         WHERE a.resume_id = ? AND r.user_id = ? AND r.deleted_at IS NULL
-         ORDER BY a.analysis_id DESC
+            analysis_id,
+            user_id,
+            resume_id,
+            overall_score,
+            analysis_status,
+            analysis_type,
+            ai_model,
+            analysis_result,
+            error_message,
+            analyzed_at
+         FROM resume_analyses
+         WHERE resume_id = ?
+         ORDER BY analysis_id DESC
          LIMIT 1`,
-        [parsedResumeId, userId]
+        [parsedResumeId]
     );
 
     if (!rows.length) {
-        // Multi-tenant check: verify if resume exists under another account
-        const [otherTenant] = await db.execute(
-            `SELECT resume_id FROM resumes WHERE resume_id = ? AND deleted_at IS NULL`,
-            [parsedResumeId]
-        );
-
-        if (otherTenant.length > 0) {
-            const err = new AnalysisWorkflowError(
-                "Access denied: you do not own this resource",
-                403,
-                "FORBIDDEN_RESOURCE"
-            );
-            throw err;
-        }
-
         return null;
     }
 
@@ -172,13 +178,14 @@ export const getLatestAnalysisForResume = async ({ resumeId, userId }) => {
         resumeId: record.resume_id,
         userId: record.user_id || userId,
         status: record.analysis_status,
+        analysisType: record.analysis_type || (record.ai_model === "rule-based-engine" ? "rule_based" : "ai"),
         overallScore: record.overall_score ? parseFloat(record.overall_score) : null,
         aiModel: record.ai_model,
         analysisResult: parsedResult,
         errorMessage: record.error_message,
         analyzedAt: record.analyzed_at,
-        resumeTitle: record.resume_title,
-        candidateName: record.candidate_name
+        resumeTitle: resumeRecord.resume_title,
+        candidateName: resumeRecord.candidate_name
     };
 };
 

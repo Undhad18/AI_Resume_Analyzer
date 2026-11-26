@@ -12,6 +12,9 @@ import authRoutes from "./routes/authRoutes.js";
 import resumeRoutes from "./routes/resumeRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import resumeBuilderRoutes from "./routes/resumeBuilderRoutes.js";
+import jobDescriptionRoutes from "./routes/jobDescriptionRoutes.js";
+import jobMatchingRoutes from "./routes/jobMatchingRoutes.js";
 
 import {
     notFoundMiddleware
@@ -59,6 +62,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/resumes", resumeRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/resume-builder", resumeBuilderRoutes);
+app.use("/api/job-descriptions", jobDescriptionRoutes);
+app.use("/api/job-matches", jobMatchingRoutes);
 
 // 404 Handler
 app.use(notFoundMiddleware);

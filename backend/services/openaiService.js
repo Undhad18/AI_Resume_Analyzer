@@ -365,7 +365,7 @@ export const analyzeFullResumeWithAi = async (structuredResume, options = {}) =>
             },
             {
                 timeout: options.timeout || 45000,
-                maxRetries: options.maxRetries ?? 2
+                maxRetries: options.maxRetries ?? 1
             }
         );
     } catch (err) {

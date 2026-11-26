@@ -78,3 +78,48 @@ export const loginLimiter = (req, res, next) => {
 
     next();
 };
+
+const builderAiCounts = new Map();
+
+/**
+ * Rate limiter for Resume Builder Advanced AI content generation requests (Lesson 8.3)
+ */
+export const builderAiLimiter = (req, res, next) => {
+    // If request mode is "free", skip AI rate limiting
+    if (req.body?.mode === "free") {
+        return next();
+    }
+
+    if (process.env.NODE_ENV === "test" && !req.headers["x-test-rate-limit"]) {
+        return next();
+    }
+
+    const key = req.user?.id ? `user_${req.user.id}` : (req.ip || req.headers["x-forwarded-for"] || "127.0.0.1");
+    const windowMs = 15 * 60 * 1000; // 15 minutes
+    const maxRequests = 25; // 25 AI generation requests per window
+    const now = Date.now();
+
+    const record = builderAiCounts.get(key) || { count: 0, resetTime: now + windowMs };
+
+    if (now > record.resetTime) {
+        record.count = 0;
+        record.resetTime = now + windowMs;
+    }
+
+    record.count += 1;
+    builderAiCounts.set(key, record);
+
+    res.setHeader("X-RateLimit-Limit", maxRequests);
+    res.setHeader("X-RateLimit-Remaining", Math.max(0, maxRequests - record.count));
+    res.setHeader("X-RateLimit-Reset", Math.ceil(record.resetTime / 1000));
+
+    if (record.count > maxRequests) {
+        return res.status(429).json({
+            success: false,
+            message: "AI generation rate limit exceeded. Please wait a few minutes or switch to 100% Free Mode.",
+            errors: null
+        });
+    }
+
+    next();
+};
